@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Baked For U – Freshly baked, just for U</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+  /* ── DESIGN TOKENS ─────────────────────────────────────────── */
+  :root {
+    --cream:   #FFF8EE;
+    --warm:    #FFF0D6;
+    --caramel: #C8792A;
+    --gold:    #E8A84C;
+    --brown:   #5C3317;
+    --dark:    #2B1A0E;
+    --green:   #25D366;
+    --shadow:  0 8px 32px rgba(92,51,23,.15);
+    --radius:  18px;
+    --font-h:  'Playfair Display', Georgia, serif;
+    --font-b:  'DM Sans', sans-serif;
+    --transition: .3s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── RESET ─────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-b);
+    background: var(--cream);
+    color: var(--dark);
+    overflow-x: hidden;
+  }
+  img { max-width: 100%; display: block; }
+  a  { text-decoration: none; color: inherit; }
+
+  /* ── NAV ────────────────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw;
+    height: 64px;
+    background: rgba(255,248,238,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(200,121,42,.15);
+    box-shadow: 0 2px 20px rgba(92,51,23,.08);
+  }
+  .nav-brand {
+    font-family: var(--font-h);
+    font-size: clamp(1.3rem,3vw,1.7rem);
+    font-weight: 900;
+    color: var(--brown);
+    letter-spacing: -.02em;
+  }
+  .nav-brand span { color: var(--caramel); }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-size: .875rem; font-weight: 500;
+    color: var(--brown); opacity: .75;
+    transition: opacity var(--transition);
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* Cart icon in nav */
+  #cart-btn {
+    position: relative; cursor: pointer;
+    background: var(--caramel); border: none; border-radius: 50%;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(200,121,42,.4);
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  #cart-btn:hover { transform: scale(1.1); box-shadow: 0 6px 18px rgba(200,121,42,.5); }
+  #cart-count {
+    position: absolute; top: -6px; right: -6px;
+    background: var(--brown); color: #fff;
+    font-size: .65rem; font-weight: 700;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--cream);
+    transition: transform var(--transition);
+  }
+  #cart-count.bump { animation: bump .3s ease; }
+  @keyframes bump { 0%,100%{transform:scale(1)} 50%{transform:scale(1.4)} }
+
+  /* ── HERO ───────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex; align-items: center;
+    overflow: hidden;
+    background: var(--dark);
+  }
+  .hero-img {
+    position: absolute; inset: 0;
+    background: url('https://i.ibb.co/8LRS92nK/bakery-shop-front-veiw-flat-icon-165488-4927.avif') center/cover no-repeat;
+    opacity: .55;
+    transform: scale(1.03);
+    animation: slowzoom 14s ease-in-out infinite alternate;
+  }
+  @keyframes slowzoom { from{transform:scale(1.03)} to{transform:scale(1.10)} }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(43,26,14,.7) 0%, rgba(200,121,42,.25) 100%);
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 120px 8vw 80px;
+    max-width: 720px;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    background: var(--gold); color: var(--dark);
+    font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    padding: .35em 1em; border-radius: 999px;
+    margin-bottom: 1.5rem;
+    animation: fadein .8s .2s both;
+  }
+  .hero-title {
+    font-family: var(--font-h);
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 900; line-height: 1.05;
+    color: #fff;
+    text-shadow: 0 4px 24px rgba(0,0,0,.4);
+    animation: fadein .8s .4s both;
+  }
+  .hero-title span { color: var(--gold); }
+  .hero-tagline {
+    margin-top: 1.2rem;
+    font-size: clamp(1rem, 2.2vw, 1.3rem);
+    color: rgba(255,255,255,.8);
+    font-weight: 300; letter-spacing: .03em;
+    animation: fadein .8s .6s both;
+  }
+  .hero-cta {
+    margin-top: 2.5rem;
+    animation: fadein .8s .8s both;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: .5em;
+    background: var(--caramel); color: #fff;
+    font-family: var(--font-b); font-size: 1rem; font-weight: 600;
+    padding: .9em 2.2em; border-radius: 999px; border: none; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(200,121,42,.5);
+    transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+  }
+  .btn-primary:hover {
+    background: var(--brown);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(92,51,23,.45);
+  }
+  @keyframes fadein { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
+
+  /* ── SECTION SHARED ─────────────────────────────────────────── */
+  section { padding: 80px 5vw; }
+  .section-label {
+    font-size: .7rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--caramel); margin-bottom: .8rem;
+  }
+  .section-title {
+    font-family: var(--font-h);
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-weight: 900; line-height: 1.1;
+    color: var(--brown);
+  }
+  .section-title span { color: var(--caramel); }
+
+  /* ── PRODUCTS ───────────────────────────────────────────────── */
+  #products { background: var(--warm); }
+  .products-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* Carousel */
+  .carousel-wrap { position: relative; }
+  .carousel-track-outer {
+    overflow: hidden;
+    border-radius: var(--radius);
+    cursor: grab;
+  }
+  .carousel-track-outer:active { cursor: grabbing; }
+  .carousel-track {
+    display: flex; gap: 1.5rem;
+    padding: 8px 4px 16px;
+    transition: transform .5s cubic-bezier(.4,0,.2,1);
+    will-change: transform;
+    user-select: none;
+  }
+
+  /* Product Card */
+  .product-card {
+    flex: 0 0 260px;
+    background: #fff;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform var(--transition), box-shadow var(--transition);
+    display: flex; flex-direction: column;
+  }
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 48px rgba(92,51,23,.2);
+  }
+  .product-img-wrap {
+    width: 100%; height: 210px; overflow: hidden;
+    position: relative;
+  }
+  .product-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .6s ease;
+  }
+  .product-card:hover .product-img-wrap img { transform: scale(1.07); }
+  .product-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--gold); color: var(--dark);
+    font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: .25em .75em; border-radius: 999px;
+  }
+  .product-body {
+    padding: 1.2rem 1.3rem 1.4rem;
+    display: flex; flex-direction: column; flex: 1;
+  }
+  .product-name {
+    font-family: var(--font-h);
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--brown); margin-bottom: .3rem;
+  }
+  .product-desc {
+    font-size: .8rem; color: #888; line-height: 1.5;
+    margin-bottom: auto; padding-bottom: 1rem;
+  }
+  .product-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: .8rem;
+  }
+  .product-price {
+    font-size: 1.3rem; font-weight: 700; color: var(--caramel);
+  }
+  .product-price sup { font-size: .7rem; vertical-align: super; }
+  .btn-add {
+    background: var(--caramel); color: #fff;
+    border: none; cursor: pointer;
+    font-family: var(--font-b); font-size: .8rem; font-weight: 600;
+    padding: .5em 1.1em; border-radius: 999px;
+    transition: background var(--transition), transform var(--transition);
+    display: flex; align-items: center; gap: .3em;
+  }
+  .btn-add:hover { background: var(--brown); transform: scale(1.05); }
+  .btn-add.added {
+    background: #27ae60;
+    animation: addpop .35s ease;
+  }
+  @keyframes addpop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+
+  /* Carousel Arrows */
+  .carousel-arrows {
+    display: flex; gap: .75rem;
+    justify-content: flex-end; margin-top: 1.5rem;
+  }
+  .arrow-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--caramel);
+    background: transparent; color: var(--caramel); font-size: 1.1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--transition), color var(--transition), transform var(--transition);
+  }
+  .arrow-btn:hover { background: var(--caramel); color: #fff; transform: scale(1.1); }
+
+  /* ── ABOUT STRIP ─────────────────────────────────────────────── */
+  .about-strip {
+    background: var(--brown);
+    padding: 60px 8vw;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 3rem;
+  }
+  .about-strip .text { flex: 1 1 300px; }
+  .about-strip .text .section-label { color: var(--gold); }
+  .about-strip .text .section-title { color: #fff; }
+  .about-strip .text p {
+    margin-top: 1.2rem; font-size: 1rem; color: rgba(255,255,255,.72);
+    line-height: 1.75;
+  }
+  .about-strip .stats {
+    display: flex; gap: 2.5rem; flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: var(--font-h);
+    font-size: 2.8rem; font-weight: 900; color: var(--gold); line-height: 1;
+  }
+  .stat-lbl { font-size: .8rem; color: rgba(255,255,255,.6); margin-top: .3rem; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* ── CART DRAWER ─────────────────────────────────────────────── */
+  .cart-backdrop {
+    position: fixed; inset: 0; background: rgba(43,26,14,.55);
+    backdrop-filter: blur(4px);
+    z-index: 1000; opacity: 0; pointer-events: none;
+    transition: opacity var(--transition);
+  }
+  .cart-backdrop.open { opacity: 1; pointer-events: all; }
+
+  .cart-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(420px, 100vw);
+    background: var(--cream);
+    z-index: 1001;
+    transform: translateX(100%);
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column;
+    box-shadow: -8px 0 40px rgba(43,26,14,.2);
+  }
+  .cart-drawer.open { transform: none; }
+
+  .cart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 1.6rem;
+    border-bottom: 1px solid rgba(200,121,42,.2);
+    background: #fff;
+  }
+  .cart-header h2 {
+    font-family: var(--font-h); font-size: 1.4rem; color: var(--brown);
+  }
+  .close-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 1.4rem; color: var(--brown); opacity: .6;
+    transition: opacity var(--transition), transform var(--transition);
+    line-height: 1;
+  }
+  .close-btn:hover { opacity: 1; transform: rotate(90deg); }
+
+  .cart-body { flex: 1; overflow-y: auto; padding: 1.2rem 1.6rem; }
+
+  .cart-empty {
+    text-align: center; padding: 3rem 1rem; color: #b0a090;
+    font-size: .95rem;
+  }
+  .cart-empty .big-emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+
+  .cart-item {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 1rem 0; border-bottom: 1px solid rgba(200,121,42,.12);
+    animation: fadein .25s ease;
+  }
+  .cart-item img {
+    width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0;
+  }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-weight: 600; font-size: .95rem; color: var(--brown); }
+  .cart-item-price { font-size: .85rem; color: var(--caramel); font-weight: 500; margin-top: .2rem; }
+  .cart-item-qty {
+    display: flex; align-items: center; gap: .5rem; margin-top: .5rem;
+  }
+  .qty-btn {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid var(--caramel); background: none; color: var(--caramel);
+    font-size: .95rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background var(--transition), color var(--transition);
+  }
+  .qty-btn:hover { background: var(--caramel); color: #fff; }
+  .qty-num { font-size: .9rem; font-weight: 600; min-width: 1.2rem; text-align: center; }
+  .cart-item-remove {
+    background: none; border: none; cursor: pointer; color: #ccc;
+    font-size: 1.1rem; transition: color var(--transition);
+    margin-top: 2px;
+  }
+  .cart-item-remove:hover { color: #e74c3c; }
+
+  .cart-footer {
+    padding: 1.4rem 1.6rem;
+    border-top: 1px solid rgba(200,121,42,.2);
+    background: #fff;
+  }
+  .cart-total {
+    display: flex; justify-content: space-between; align-items: center;
+    font-weight: 700; font-size: 1.05rem; color: var(--brown);
+    margin-bottom: 1.3rem;
+  }
+  .cart-total span { color: var(--caramel); font-size: 1.3rem; }
+
+  /* ── ORDER FORM (inside cart drawer) ────────────────────────── */
+  .order-form { margin-bottom: 1.2rem; }
+  .order-form h3 {
+    font-family: var(--font-h); font-size: 1.05rem; color: var(--brown);
+    margin-bottom: .9rem;
+  }
+  .form-row { margin-bottom: .8rem; }
+  .form-row label {
+    display: block; font-size: .78rem; font-weight: 600;
+    color: var(--brown); margin-bottom: .3rem; letter-spacing: .04em; text-transform: uppercase;
+  }
+  .form-row input, .form-row textarea {
+    width: 100%; padding: .65em .9em;
+    border: 1.5px solid rgba(200,121,42,.3); border-radius: 10px;
+    font-family: var(--font-b); font-size: .9rem; color: var(--dark);
+    background: var(--cream);
+    transition: border-color var(--transition);
+    outline: none;
+    resize: vertical;
+  }
+  .form-row input:focus, .form-row textarea:focus { border-color: var(--caramel); }
+
+  .btn-send {
+    width: 100%;
+    background: linear-gradient(135deg, var(--caramel), var(--brown));
+    color: #fff; border: none; cursor: pointer;
+    font-family: var(--font-b); font-size: 1rem; font-weight: 700;
+    padding: .85em; border-radius: 12px; letter-spacing: .03em;
+    box-shadow: 0 6px 20px rgba(200,121,42,.4);
+    transition: opacity var(--transition), transform var(--transition);
+    display: flex; align-items: center; justify-content: center; gap: .5em;
+  }
+  .btn-send:hover:not(:disabled) { opacity: .9; transform: translateY(-2px); }
+  .btn-send:disabled { opacity: .6; cursor: not-allowed; }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--brown); color: #fff;
+    padding: .8em 1.8em; border-radius: 999px;
+    font-size: .9rem; font-weight: 500;
+    z-index: 2000; pointer-events: none;
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #27ae60; }
+  #toast.error   { background: #e74c3c; }
+
+  /* ── FLOATS: WhatsApp ────────────────────────────────────────── */
+  .float-wa {
+    position: fixed; bottom: 28px; left: 28px; z-index: 950;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 6px 20px rgba(37,211,102,.5);
+    transition: transform var(--transition), box-shadow var(--transition);
+    animation: floatpulse 3s ease-in-out infinite;
+  }
+  .float-wa:hover {
+    transform: scale(1.12);
+    box-shadow: 0 10px 28px rgba(37,211,102,.6);
+    animation: none;
+  }
+  @keyframes floatpulse {
+    0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)}
+  }
+
+  /* ── FOOTER ─────────────────────────────────────────────────── */
+  footer {
+    background: var(--dark); color: rgba(255,255,255,.6);
+    padding: 40px 8vw;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 1rem;
+  }
+  .footer-brand {
+    font-family: var(--font-h); font-size: 1.4rem; font-weight: 900;
+    color: #fff;
+  }
+  .footer-brand span { color: var(--gold); }
+  footer p { font-size: .82rem; }
+  footer a { color: var(--gold); }
+
+  /* ── MOBILE ─────────────────────────────────────────────────── */
+  @media(max-width: 640px) {
+    .nav-links { display: none; }
+    .hero-content { padding: 100px 6vw 60px; }
+    .about-strip { padding: 50px 6vw; }
+    .carousel-track { gap: 1rem; }
+    .product-card { flex: 0 0 220px; }
+  }
+
+  /* ── SCROLLBAR ──────────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(200,121,42,.35); border-radius: 999px; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">Baked <span>For U</span></div>
+  <div class="nav-links">
+    <a href="#products">Products</a>
+    <a href="#about">About</a>
+  </div>
+  <button id="cart-btn" onclick="openCart()" aria-label="Open cart">
+    🛒
+    <span id="cart-count">0</span>
+  </button>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────── -->
+<section class="hero" id="home">
+  <div class="hero-img"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">✨ Fresh Daily</div>
+    <h1 class="hero-title">Baked <span>For U</span></h1>
+    <p class="hero-tagline">Freshly baked, just for U</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+        🧁 Shop Now
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRODUCTS ──────────────────────────────────────────────────── -->
+<section id="products">
+  <div class="products-header">
+    <div>
+      <p class="section-label">🍞 Our Treats</p>
+      <h2 class="section-title">Fresh from the <span>Oven</span></h2>
+    </div>
+  </div>
+
+  <div class="carousel-wrap">
+    <div class="carousel-track-outer" id="carouselOuter">
+      <div class="carousel-track" id="carouselTrack"></div>
+    </div>
+    <div class="carousel-arrows">
+      <button class="arrow-btn" onclick="shiftCarousel(-1)" aria-label="Previous">&#8592;</button>
+      <button class="arrow-btn" onclick="shiftCarousel(1)"  aria-label="Next">&#8594;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT STRIP ───────────────────────────────────────────────── -->
+<div class="about-strip" id="about">
+  <div class="text">
+    <p class="section-label">Our Story</p>
+    <h2 class="section-title" style="color:#fff">Made with <span style="color:var(--gold)">Love</span></h2>
+    <p>
+      Every loaf, cake, and cookie at <strong>Baked For U</strong> is crafted from scratch using the finest local ingredients.
+      No preservatives, no shortcuts — just real, honest baking with a whole lot of heart. ❤️
+    </p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Fresh Daily</div></div>
+    <div class="stat"><div class="stat-num">50+</div><div class="stat-lbl">Happy Clients</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-lbl">Preservatives</div></div>
+  </div>
+</div>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-brand">Baked <span>For U</span></div>
+  <p>Freshly baked, just for U &nbsp;•&nbsp; <a href="mailto:sumitradas111978@gmail.com">sumitradas111978@gmail.com</a></p>
+  <p>© 2024 Baked For U</p>
+</footer>
+
+<!-- ── WHATSAPP FLOAT ─────────────────────────────────────────────── -->
+<a href="https://wa.me/918479879466" target="_blank" class="float-wa" aria-label="WhatsApp Us">
+  <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</a>
+
+<!-- ── CART BACKDROP & DRAWER ─────────────────────────────────────── -->
+<div class="cart-backdrop" id="cartBackdrop" onclick="closeCart()"></div>
+
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h2>🛒 Your Cart</h2>
+    <button class="close-btn" onclick="closeCart()">✕</button>
+  </div>
+
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty">
+      <div class="big-emoji">🧁</div>
+      <p>Your cart is empty.<br>Add something delicious!</p>
+    </div>
+  </div>
+
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      Total <span id="cartTotal">₹0</span>
+    </div>
+
+    <!-- Customer form -->
+    <div class="order-form">
+      <h3>📋 Your Details</h3>
+      <div class="form-row">
+        <label for="custName">Full Name *</label>
+        <input type="text" id="custName" placeholder="e.g. Priya Sharma" required/>
+      </div>
+      <div class="form-row">
+        <label for="custPhone">Phone Number *</label>
+        <input type="tel" id="custPhone" placeholder="e.g. 9876543210" required/>
+      </div>
+      <div class="form-row">
+        <label for="custNote">Note / Delivery Address</label>
+        <textarea id="custNote" rows="2" placeholder="Any special request or address..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn-send" id="sendOrderBtn" onclick="sendOrder()">
+      <span>📧 Send Order</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── TOAST ──────────────────────────────────────────────────────── -->
+<div id="toast"></div>
+
+<!-- ── SCRIPTS ────────────────────────────────────────────────────── -->
+<script>
+/* ─── 1. PRODUCT DATA ─────────────────────────────────────────── */
+const products = [
+  { id:1, name:"Celebration Cake",      price:650,  badge:"🎂 Best Seller", desc:"Rich layered cake with buttercream frosting.",    img:"https://i.ibb.co/DPkhG9yq/592756249-122268309674076131-4357722854306740214-n.jpg" },
+  { id:2, name:"Cream Roll",            price:180,  badge:"🥐 Fresh Today", desc:"Flaky roll filled with sweet whipped cream.",       img:"https://i.ibb.co/dC0jBZj/603838460-122271878288076131-185089378809517237-n.jpg" },
+  { id:3, name:"Swiss Roll",            price:220,  badge:"🍰 Popular",     desc:"Soft sponge rolled with cream & jam filling.",      img:"https://i.ibb.co/rfZ0JJzW/619159279-122276022512076131-819969998717115830-n.jpg" },
+  { id:4, name:"Mini Bites Assortment", price:290,  badge:"✨ New",         desc:"Bite-sized treats perfect for gifting.",            img:"https://i.ibb.co/pjN02x9h/622386579-122276279300076131-867399027135669009-n.jpg" },
+  { id:5, name:"Biscuit Tin",           price:350,  badge:"🍪 Classic",     desc:"Crispy home-style biscuits, dozen in a tin.",       img:"https://i.ibb.co/v6bpj2Xq/653633210-122283548342076131-2370930706108870139-n.jpg" },
+  { id:6, name:"Birthday Cake",         price:800,  badge:"🎁 Custom",      desc:"Customisable birthday cake – order 1 day ahead.",   img:"https://i.ibb.co/s9KqP0m6/657486864-122285335142076131-7200336321144764401-n.jpg" },
+  { id:7, name:"Layered Pastry",        price:160,  badge:"🥧 Fresh",       desc:"Crisp pastry with sweet cream & fresh fruit.",      img:"https://i.ibb.co/8grQXt3W/699111905-122292541154076131-6469607137985585620-n.jpg" },
+  { id:8, name:"Designer Cake",         price:950,  badge:"💎 Premium",     desc:"Artisan designer cake for special occasions.",      img:"https://i.ibb.co/yFdPTVX1/696940986-122292654806076131-4269603313676554802-n.jpg" },
+];
+
+/* ─── 2. CART STATE ───────────────────────────────────────────── */
+let cart = {};   // { productId: {product, qty} }
+
+/* ─── 3. RENDER CAROUSEL ─────────────────────────────────────── */
+function renderCarousel() {
+  const track = document.getElementById('carouselTrack');
+  track.innerHTML = products.map(p => `
+    <div class="product-card">
+      <div class="product-img-wrap">
+        <img src="${p.img}" alt="${p.name}" loading="lazy"/>
+        <div class="product-badge">${p.badge}</div>
+      </div>
+      <div class="product-body">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div class="product-price"><sup>₹</sup>${p.price}</div>
+          <button class="btn-add" id="addbtn-${p.id}" onclick="addToCart(${p.id})">
+            ＋ Add
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ─── 4. CAROUSEL NAVIGATION ─────────────────────────────────── */
+let carouselPos = 0;
+const CARD_W = 260 + 24; // card width + gap
+
+function shiftCarousel(dir) {
+  const outer = document.getElementById('carouselOuter');
+  const track = document.getElementById('carouselTrack');
+  const maxPos = track.scrollWidth - outer.clientWidth;
+  carouselPos = Math.max(0, Math.min(maxPos, carouselPos + dir * CARD_W * 2));
+  track.style.transform = `translateX(-${carouselPos}px)`;
+}
+
+// Touch/drag
+(function() {
+  let startX = 0, dragging = false, startPos = 0;
+  const outer = document.getElementById('carouselOuter');
+  const track = document.getElementById('carouselTrack');
+
+  function getClient(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
+
+  outer.addEventListener('mousedown', e => { dragging=true; startX=getClient(e); startPos=carouselPos; });
+  outer.addEventListener('touchstart', e => { startX=getClient(e); startPos=carouselPos; }, {passive:true});
+  document.addEventListener('mouseup',  ()=>dragging=false);
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    const dx = startX - getClient(e);
+    const maxPos = track.scrollWidth - outer.clientWidth;
+    carouselPos = Math.max(0, Math.min(maxPos, startPos + dx));
+    track.style.transform = `translateX(-${carouselPos}px)`;
+  });
+  outer.addEventListener('touchmove', e => {
+    const dx = startX - getClient(e);
+    const maxPos = track.scrollWidth - outer.clientWidth;
+    carouselPos = Math.max(0, Math.min(maxPos, startPos + dx));
+    track.style.transform = `translateX(-${carouselPos}px)`;
+  }, {passive:true});
+})();
+
+/* ─── 5. AUTO-SLIDE ──────────────────────────────────────────── */
+let autoSlide = setInterval(()=>shiftCarousel(1), 3500);
+document.getElementById('carouselOuter').addEventListener('mouseenter',()=>clearInterval(autoSlide));
+document.getElementById('carouselOuter').addEventListener('mouseleave',()=>{ autoSlide=setInterval(()=>shiftCarousel(1),3500); });
+
+/* ─── 6. ADD TO CART ─────────────────────────────────────────── */
+function addToCart(id) {
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+  if(cart[id]) cart[id].qty++;
+  else cart[id] = { product: p, qty: 1 };
+  updateCartUI();
+
+  // button feedback
+  const btn = document.getElementById('addbtn-'+id);
+  if(btn){ btn.textContent='✓ Added'; btn.classList.add('added'); setTimeout(()=>{ btn.textContent='＋ Add'; btn.classList.remove('added'); },1200); }
+
+  // count bump
+  const countEl = document.getElementById('cart-count');
+  countEl.classList.remove('bump');
+  void countEl.offsetWidth;
+  countEl.classList.add('bump');
+
+  showToast(`${p.name} added! 🧁`);
+}
+
+/* ─── 7. CART UI ─────────────────────────────────────────────── */
+function updateCartUI() {
+  const items = Object.values(cart);
+  const totalQty = items.reduce((s,i)=>s+i.qty, 0);
+  const totalPrice = items.reduce((s,i)=>s+i.product.price*i.qty, 0);
+
+  document.getElementById('cart-count').textContent = totalQty;
+
+  const body = document.getElementById('cartBody');
+  const footer = document.getElementById('cartFooter');
+
+  if(items.length === 0) {
+    body.innerHTML = `<div class="cart-empty"><div class="big-emoji">🧁</div><p>Your cart is empty.<br>Add something delicious!</p></div>`;
+    footer.style.display = 'none';
+    return;
+  }
+
+  footer.style.display = 'block';
+  document.getElementById('cartTotal').textContent = '₹'+totalPrice;
+
+  body.innerHTML = items.map(i=>`
+    <div class="cart-item">
+      <img src="${i.product.img}" alt="${i.product.name}"/>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${i.product.name}</div>
+        <div class="cart-item-price">₹${i.product.price} each</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeQty(${i.product.id},-1)">−</button>
+          <span class="qty-num">${i.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${i.product.id},1)">＋</button>
+        </div>
+      </div>
+      <button class="cart-item-remove" onclick="removeItem(${i.product.id})" aria-label="Remove">✕</button>
+    </div>
+  `).join('');
+}
+
+function changeQty(id, delta) {
+  if(!cart[id]) return;
+  cart[id].qty += delta;
+  if(cart[id].qty <= 0) delete cart[id];
+  updateCartUI();
+}
+function removeItem(id) { delete cart[id]; updateCartUI(); }
+
+function openCart()  { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartBackdrop').classList.add('open'); }
+function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartBackdrop').classList.remove('open'); }
+
+/* ─── 8. SEND ORDER VIA EMAILJS ──────────────────────────────── */
+emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");  // ← replace with your EmailJS public key
+
+async function sendOrder() {
+  const name  = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const note  = document.getElementById('custNote').value.trim();
+
+  if(!name)  { showToast('Please enter your name','error'); return; }
+  if(!phone) { showToast('Please enter your phone number','error'); return; }
+
+  const items = Object.values(cart);
+  if(items.length === 0) { showToast('Cart is empty!','error'); return; }
+
+  const itemsList = items.map(i=>`• ${i.product.name} × ${i.qty}  = ₹${i.product.price * i.qty}`).join('\n');
+  const total     = items.reduce((s,i)=>s+i.product.price*i.qty, 0);
+
+  const btn = document.getElementById('sendOrderBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>Sending… ⏳</span>';
+
+  const templateParams = {
+    to_email:    'sumitradas111978@gmail.com',
+    customer_name:  name,
+    customer_phone: phone,
+    order_items:    itemsList,
+    order_total:    '₹' + total,
+    customer_note:  note || 'None',
+    shop_name:      'Baked For U',
+  };
+
+  try {
+    await emailjs.send(
+      'YOUR_SERVICE_ID',    // ← replace with your EmailJS service ID
+      'YOUR_TEMPLATE_ID',   // ← replace with your EmailJS template ID
+      templateParams
+    );
+    showToast('Order sent! We\'ll contact you soon 🎉','success');
+    cart = {};
+    updateCartUI();
+    document.getElementById('custName').value = '';
+    document.getElementById('custPhone').value = '';
+    document.getElementById('custNote').value = '';
+    setTimeout(closeCart, 1800);
+  } catch(err) {
+    console.error(err);
+    showToast('Could not send order. Try WhatsApp instead!','error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>📧 Send Order</span>';
+  }
+}
+
+/* ─── 9. TOAST ───────────────────────────────────────────────── */
+let toastTimeout;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(()=>{ el.className=''; }, 3000);
+}
+
+/* ─── 10. INIT ───────────────────────────────────────────────── */
+renderCarousel();
+updateCartUI();
+</script>
+</body>
+</html>
