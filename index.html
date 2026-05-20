@@ -10,8 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 
-<!-- EmailJS -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
   /* ── DESIGN TOKENS ─────────────────────────────────────────── */
@@ -606,8 +604,9 @@
     </div>
 
     <button class="btn-send" id="sendOrderBtn" onclick="sendOrder()">
-      <span>📧 Send Order</span>
+      <span>📧 Send Order via Email</span>
     </button>
+    <p style="font-size:.72rem;color:#aaa;text-align:center;margin-top:.6rem">Opens your email app pre-filled with the order</p>
   </div>
 </div>
 
@@ -767,56 +766,52 @@ function openCart()  { document.getElementById('cartDrawer').classList.add('open
 function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartBackdrop').classList.remove('open'); }
 
 /* ─── 8. SEND ORDER VIA EMAILJS ──────────────────────────────── */
-emailjs.init("UydvvQ1AHBRE6pUyt");  // ← replace with your EmailJS public key
-
-async function sendOrder() {
+function sendOrder() {
   const name  = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const note  = document.getElementById('custNote').value.trim();
 
-  if(!name)  { showToast('Please enter your name','error'); return; }
-  if(!phone) { showToast('Please enter your phone number','error'); return; }
+  if(!name)  { showToast('Please enter your name ✏️','error'); return; }
+  if(!phone) { showToast('Please enter your phone number 📱','error'); return; }
 
   const items = Object.values(cart);
   if(items.length === 0) { showToast('Cart is empty!','error'); return; }
 
-  const itemsList = items.map(i=>`• ${i.product.name} × ${i.qty}  = ₹${i.product.price * i.qty}`).join('\n');
+  const itemLines = items.map(i=>`  • ${i.product.name} x${i.qty}  = Rs.${i.product.price * i.qty}`).join('\n');
   const total     = items.reduce((s,i)=>s+i.product.price*i.qty, 0);
 
-  const btn = document.getElementById('sendOrderBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>Sending… ⏳</span>';
+  const subject = encodeURIComponent(`New Order from ${name} – Baked For U`);
+  const body    = encodeURIComponent(
+`Hello Baked For U team,
 
-  const templateParams = {
-    to_email:    'sumitradas111978@gmail.com',
-    customer_name:  name,
-    customer_phone: phone,
-    order_items:    itemsList,
-    order_total:    '₹' + total,
-    customer_note:  note || 'None',
-    shop_name:      'Baked For U',
-  };
+I would like to place the following order:
 
-  try {
-    await emailjs.send(
-      'service_gwaxwiq',    // ← replace with your EmailJS service ID
-      'template_rhq3qes',   // ← replace with your EmailJS template ID
-      templateParams
-    );
-    showToast('Order sent! We\'ll contact you soon 🎉','success');
+ORDER DETAILS
+─────────────────────────────
+${itemLines}
+─────────────────────────────
+TOTAL:  Rs.${total}
+
+CUSTOMER DETAILS
+Name  : ${name}
+Phone : ${phone}
+Note  : ${note || 'None'}
+
+Please confirm my order. Thank you!`
+  );
+
+  const mailtoLink = `mailto:sumitradas111978@gmail.com?subject=${subject}&body=${body}`;
+  window.location.href = mailtoLink;
+
+  showToast('Email app opened with your order! 🎉','success');
+  setTimeout(() => {
     cart = {};
     updateCartUI();
     document.getElementById('custName').value = '';
     document.getElementById('custPhone').value = '';
     document.getElementById('custNote').value = '';
-    setTimeout(closeCart, 1800);
-  } catch(err) {
-    console.error(err);
-    showToast('Could not send order. Try WhatsApp instead!','error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<span>📧 Send Order</span>';
-  }
+    closeCart();
+  }, 2000);
 }
 
 /* ─── 9. TOAST ───────────────────────────────────────────────── */
